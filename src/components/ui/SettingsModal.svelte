@@ -4,8 +4,9 @@
 	import { closeModal } from 'svelte-modals';
 	import Icon from '@iconify/svelte';
 	import darkMode from '$stores/darkMode';
-	import { model } from '$stores/model';
+	import { allModels, model } from '$stores/model';
 	import { Label, Select, Input, Checkbox } from 'flowbite-svelte';
+	import ModelSelection from './ModelSelection.svelte';
 
 	export let isOpen = true;
 
@@ -16,17 +17,12 @@
 	];
 	let selectedDark = $darkMode ? $darkMode : darkOptions[0].value;
 
-	let models = [
-		{ value: 'gpt4', name: 'GPT-4' },
-		{ value: 'gpt3.5', name: 'GPT-3.5-turbo' },
-		{ value: 'codellama', name: 'CodeLlama' },
-		{ value: 'huggingface', name: 'Hugging Face Model' }
-	];
-	let selected = $model ? $model : models[0].value;
 	function handleSwitchDarkMode(input: any) {
 		const value = input.target.value;
 		darkMode.set(value);
 	}
+	let selected = $model ? $model : allModels[0].value;
+	let selectedName = allModels.find((m) => m.value === selected).name;
 </script>
 
 {#if isOpen}
@@ -68,6 +64,10 @@
 								}}
 							/>
 						</div>
+						<Label class="mb-5">
+							Default Model:
+							<ModelSelection {selected} {selectedName} />
+						</Label>
 
 						<Checkbox class="mb-2">Auto-Run Commands</Checkbox>
 						<Checkbox>Enable Debug Mode</Checkbox>
@@ -84,12 +84,7 @@
 
 				<section class="mb-8">
 					<h2 class="mb-2 text-xl font-semibold">Environment</h2>
-					<div class="flex flex-col gap-2">
-						<Label>
-							Default Model:
-							<Select class="mt-2" items={models} bind:value={selected} />
-						</Label>
-
+					<div class="flex flex-col gap-4">
 						<Checkbox>Use Azure Deployment</Checkbox>
 					</div>
 				</section>

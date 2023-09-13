@@ -2,6 +2,7 @@
 	import ChatBar from '$components/chat/ChatBar.svelte';
 	import ChatWindow from '$components/chat/ChatWindow.svelte';
 	import { activeChat } from '$stores/activeChat';
+	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
 	export let data;
 	onMount(() => {
@@ -10,7 +11,7 @@
 	});
 </script>
 
-<div class="w-full h-full">
-	<ChatBar />
+<div class="relative flex w-full h-screen">
+	<!-- <ChatBar /> -->
 	<ChatWindow />
 </div>

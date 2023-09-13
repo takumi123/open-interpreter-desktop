@@ -38,8 +38,9 @@
 
 @layer components {
 	body {
-		transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 		@apply bg-white dark:bg-slate-800 text-black dark:text-white;
+		transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+		scroll-behavior: smooth;
 	}
 	p {
 		@apply text-base text-slate-800 dark:text-slate-100;
@@ -50,10 +51,10 @@
 	}
 
 	.btn {
-		@apply text-white border border-gray-200 font-bold py-2 px-4 rounded-lg transition;
+		@apply font-bold py-2 px-4 rounded-lg transition;
 	}
 	.btn-primary {
-		@apply bg-primary-500 hover:bg-primary-600;
+		@apply text-white transition rounded-lg bg-gradient-to-b from-gray-500 to-black dark:from-white dark:to-gray-300 dark:text-black hover:bg-gray-600 dark:hover:bg-gray-400;
 	}
 	.btn-secondary {
 		@apply bg-secondary-500 hover:bg-secondary-600;
@@ -101,4 +102,22 @@
 		opacity: 1;
 		filter: blur(0px);
 	}
+}
+
+.user-message p,
+.user-message ul,
+.user-message li,
+.user-message h1,
+.user-message h2,
+.user-message h3,
+.user-message h4 {
+	color: white !important;
+}
+
+pre code {
+	@apply rounded-md shadow-md;
+}
+
+code {
+	@apply rounded-md shadow-md px-3 py-0.5 bg-black text-sky-500;
 }

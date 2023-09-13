@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { shortcut } from './../../lib/shortcut.ts';
 	import { v4 } from 'uuid';
 	import { model } from '$stores/model';
 	import Icon from '@iconify/svelte';
@@ -18,6 +19,23 @@
 	import type { ChatType } from '$types/chat';
 	import { activeChat } from '$stores/activeChat';
 	import { allChats } from '$stores/allChats';
+
+	let editingChatId = null;
+
+	const renameChat = (id) => {
+		editingChatId = id;
+	};
+
+	const saveChatTitle = (id, newTitle) => {
+		allChats.update((chats) => {
+			const chat = chats.find((chat) => chat.id === id);
+			if (chat) {
+				chat.title = newTitle;
+			}
+			return chats;
+		});
+		editingChatId = null; // reset editing state
+	};
 	const deleteChat = async (id) => {
 		console.log('deleting:', id);
 		const chat = $allChats.find((chat) => chat.id === id);
@@ -50,6 +68,12 @@
 		allChats.update((chats) => [...chats, newChat]);
 		activeChat.set(newChat);
 		window.location.href = `/chat/${newChat.id}`;
+	};
+	const formatDate = (dateString) => {
+		const date = new Date(dateString);
+		return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear().toString().substr(-2)} ${
+			date.getHours() % 12 || 12
+		}:${date.getMinutes().toString().padStart(2, '0')}${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 	};
 </script>
 
@@ -88,23 +112,51 @@
 							data-sveltekit-reload
 							class={`flex items-center justify-between w-full px-1 py-2 transition rounded-md group ${
 								activeUrl === `/chat/${chat.id}`
-									? 'bg-gray-300/40  '
+									? 'bg-gray-300/40  dark:bg-gray-600/50'
 									: 'hover:bg-gray-100 dark:hover:bg-gray-700 '
 							}`}
-							href={`/chat/${chat.id}`}
+							href={editingChatId === chat.id ? undefined : `/chat/${chat.id}`}
 						>
 							<div class="flex items-center gap-2">
 								<Icon
 									icon="ci:chat-conversation"
 									class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200"
 								/>
-								<p class="text-sm">
-									{chat.title.length > 19 ? chat.title.slice(0, 19) + '...' : chat.title}
-								</p>
-								<p class="text-xs">{chat.id.slice(0, 6)}</p>
+								<div class="flex flex-col items-start">
+									{#if editingChatId === chat.id}
+										<div class="flex items-center gap-1">
+											<input
+												use:shortcut={{ code: 'Escape', callback: () => (editingChatId = null) }}
+												use:shortcut={{
+													code: 'Enter',
+													callback: () => saveChatTitle(chat.id, chat.title)
+												}}
+												bind:value={chat.title}
+												on:blur={() => saveChatTitle(chat.id, chat.title)}
+												class="border border-gray-300 rounded-md w-36 focus:ring-1 dark:bg-gray-700 focus:ring-black focus:border-black dark:focus:border-white dark:border-gray-700"
+												autofocus
+											/>
+											<button
+												on:click={() => saveChatTitle(chat.id, chat.title)}
+												class="p-1 transition rounded-md hover:bg-white dark:hover:bg-gray-700"
+											>
+												<Icon icon="tabler:check" class="text-green-500" />
+											</button>
+										</div>
+									{:else}
+										<p class="text-sm font-semibold truncate">
+											{chat.title}
+										</p>
+										<p class="text-xs font-light">{formatDate(chat.updatedAt)}</p>
+									{/if}
+								</div>
 							</div>
 							<button
-								class={`dots-menu-sidebar-${chat.id} z-10 py-1 transition rounded-md opacity-0 group-hover:opacity-100 hover:bg-white dark:hover:bg-black`}
+								class={`dots-menu-sidebar-${
+									chat.id
+								} z-10 py-1 transition rounded-md opacity-0 group-hover:opacity-100 hover:bg-white dark:hover:bg-black ${
+									editingChatId ? '!hidden' : ''
+								}}`}
 								on:click|stopPropagation|preventDefault={() => {
 									// console.log('click');
 								}}
@@ -119,6 +171,15 @@
 									{activeUrl}
 									class="z-10 text-gray-700 bg-white border-gray-100 divide-y divide-gray-100 rounded shadow-md outline-none dark:bg-gray-700 dark:text-gray-200 dark:border-gray-700 dark:divide-gray-600"
 								>
+									<DropdownItem on:click={() => renameChat(chat.id)}>
+										<div class="flex items-center w-full gap-3">
+											<Icon
+												icon="tabler:edit"
+												class="w-4 h-4 text-gray-700 transition duration-75 dark:text-white "
+											/>
+											<span class="text-gray-700 dark:text-white">Rename</span>
+										</div>
+									</DropdownItem>
 									<DropdownItem
 										on:click={async () => {
 											await deleteChat(chat.id);
@@ -132,7 +193,6 @@
 											<span class="text-rose-500 dark:text-rose-700">Delete</span>
 										</div></DropdownItem
 									>
-									{chat.id.slice(0, 6)}
 								</Dropdown>
 							</button>
 						</a>
