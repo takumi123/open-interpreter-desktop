@@ -1,6 +1,6 @@
 {
-	"appId": "com.tangent.app",
-	"productName": "Tangent AI",
+	"appId": "com.oid.app",
+	"productName": "Open Interpreter Desktop",
 	"directories": {
 		"output": "dist"
 	},

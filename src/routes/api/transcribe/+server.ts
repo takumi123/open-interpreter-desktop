@@ -10,7 +10,6 @@ export const config = {
 export async function POST({ request }) {
 	try {
 		let text = '';
-		console.log('request received!');
 		const body = await request.formData();
 		const file = await body.get('audio');
 		const openai = new OpenAI({
@@ -20,7 +19,7 @@ export async function POST({ request }) {
 			file: file,
 			model: 'whisper-1'
 		});
-		console.log(transcription);
+		console.log(transcription.text);
 
 		text = transcription.text;
 

@@ -3,6 +3,8 @@ const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const contextMenu = require('electron-context-menu');
 const serve = require('electron-serve');
 const path = require('path');
+const { PythonShell } = require('python-shell');
+const { exec } = require('child_process');
 
 try {
 	require('electron-reloader')(module);
@@ -105,4 +107,35 @@ app.on('window-all-closed', () => {
 
 ipcMain.on('to-main', (event, count) => {
 	return mainWindow.webContents.send('from-main', `next count is ${count + 1}`);
+});
+ipcMain.handle('execute-script', async (event, script) => {
+	// Evaluates the script here and return the result
+	return eval(script);
+});
+
+ipcMain.handle('execute-python-script', async (event, script) => {
+	return new Promise((resolve, reject) => {
+		let output = '';
+		const options = {
+			mode: 'text',
+			pythonOptions: ['-u'], // unbuffered
+			args: [script]
+		};
+		PythonShell.run('./execute.py', options).then((messages) => {
+			console.log('finished');
+			resolve({ result: results });
+		});
+	});
+});
+
+ipcMain.handle('run-command', (event, command) => {
+	return new Promise((resolve, reject) => {
+		exec(command, (error, stdout, stderr) => {
+			if (error) {
+				reject(error);
+			} else {
+				resolve(stdout ? stdout : stderr);
+			}
+		});
+	});
 });

@@ -121,3 +121,13 @@ pre code {
 code {
 	@apply rounded-md shadow-md px-3 py-0.5 bg-black text-sky-500;
 }
+
+.chat-message p,
+.chat-message ul,
+.chat-message li,
+.chat-message h1,
+.chat-message h2,
+.chat-message h3,
+.chat-message pre {
+	@apply whitespace-pre-line my-2;
+}
