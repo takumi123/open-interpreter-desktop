@@ -28,8 +28,9 @@
 		<video
 			src="https://user-images.githubusercontent.com/63927363/264166941-37152071-680d-4423-9af3-64836a6f7b60.mp4"
 			controls
+			autoplay
 			volume="0.6"
-			class="w-1/2 mx-auto mt-10 rounded-md shadow-md"
+			class="w-1/2 mx-auto mt-10 rounded-md shadow-md fade-effect"
 		>
 			<track kind="captions" src="empty.vtt" srclang="en" />
 		</video>
